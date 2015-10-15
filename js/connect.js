@@ -251,19 +251,19 @@ var promise = totalApps.execute();
 
 promise.then(function(results) {
     //After we have the total number of sales, we want to get the number of sales made by toyota alone
-    var resQuery = connect.query('ApplicationSubmitAfter')
+    var resQuery = connect.query(collection)
                 .select({
                     Count: 'count',
                 })
-                .filter({type: 'Residential'})
+                .filter({type: 'Residential', eventName: 'ApplicationSubmitAfter'})
                 .timeframe(timeFrame)
                 .timezone(timeZone);
 
-    var comQuery = connect.query('ApplicationSubmitAfter')
+    var comQuery = connect.query(collection)
                 .select({
                     Count: 'count',
                 })
-                .filter({type: 'Commercial'})
+                .filter({type: 'Commercial', eventName: 'ApplicationSubmitAfter'})
                 .timeframe(timeFrame)
                 .timezone(timeZone);
     

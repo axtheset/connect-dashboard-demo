@@ -7,8 +7,13 @@ var connect = new Connect({
     apiKey: 'F74167F644CEF740B2A8DBD2C641B562-0B5B16826B417526958C51C645909A4BA35601B63E20594180C02E51670F9D8501AFEF305CD6B134A25DB2B290D76D84'
   });
  
+var timeFrame = "this_week";
+var collection = "ISLANDTON-SUPP"
+/*var timeFrame = {};
+timeFrame.start = "2015-08-23T00:00:00.000Z";
+timeFrame.end = "2015-08-26T00:00:00.000Z";*/
 
-
+var timeZone = "America/New_York";
 /**************************************************************************
 |  Queries for top row
 **************************************************************************/
@@ -20,55 +25,60 @@ var numberFormatter = function (value){
     return numeral(value).format('0a');
 };
 
-var totalApps = connect.query('ApplicationSubmitAfter')
+var totalApps = connect.query(collection)
   .select({
     totalApps: "count"
   })
   .filter({
-    type: { neq: 'test' }
+    type: { neq: 'test' },
+    eventName: { eq: 'ApplicationSubmitAfter'}
   })
-  .timeframe('this_week')
-  .timezone('America/New_York');
+  .timeframe(timeFrame)
+  .timezone(timeZone);
 
-var feeTotal = connect.query('ApplicationSubmitAfter')
+var feeTotal = connect.query(collection)
   .select({
     feeTotal: { sum: "feeTotal" }
   })
   .filter({
-    type: { neq: 'test' }
+    type: { neq: 'test' }, 
+    eventName: { eq: 'ApplicationSubmitAfter'}
   })
-  .timeframe('this_week')
-  .timezone('America/New_York');
+  .timeframe(timeFrame)
+  .timezone(timeZone);
 
-var constrTotal = connect.query('ApplicationSubmitAfter')
+var constrTotal = connect.query(collection)
   .select({
     constrValue: { sum: "constrValue" }
   })
   .filter({
-    type: { neq: 'test' }
+    type: { neq: 'test' },
+    eventName: { eq: 'ApplicationSubmitAfter'}
   })
-  .timeframe('this_week')
-  .timezone('America/New_York');
+  .timeframe(timeFrame)
+  .timezone(timeZone);
 
-var totalWF = connect.query('WorkflowTaskUpdateAfter')
+var totalWF = connect.query(collection)
   .select({
     totalTasks: "count"
   })
   .filter({
-    type: { neq: 'test' }
+    type: { neq: 'test' },
+    eventName: { eq: 'WorkflowTaskUpdateAfter'}
   })
-  .timeframe('this_week')
-  .timezone('America/New_York');
+  .timeframe(timeFrame)
+  .timezone(timeZone);
 
-var totalInsp = connect.query('V360InspectionResultSubmitAfter')
+var totalInsp = connect.query(collection)
   .select({
     totalInspections: "count"
   })
   .filter({
-    type: { neq: 'test' }
+    type: { neq: 'test' },
+    eventName: { eq: 'V360InspectionResultSubmitAfter'}
   })
-  .timeframe('this_week')
-  .timezone('America/New_York');
+  .timeframe(timeFrame)
+  .timezone(timeZone);
 
 /**************************************************************************
 |  Visualizations for top row
@@ -123,40 +133,43 @@ connect.text(totalInsp, '#thisWeekInsp', {
 |  Queries for left column
 **************************************************************************/
 
-var submittedQuery = connect.query('ApplicationSubmitAfter')
+var submittedQuery = connect.query(collection)
   .select({
     Applications: "count"
   })
   .filter({
-    type: { neq: 'test' }
+    type: { neq: 'test' },
+    eventName: { eq: 'ApplicationSubmitAfter'}
   })
-  .timeframe('this_week')
+  .timeframe(timeFrame)
   .groupBy('type')
-  .timezone('America/New_York');
+  .timezone(timeZone);
 
-var submittedByDayQuery = connect.query('ApplicationSubmitAfter')
+var submittedByDayQuery = connect.query(collection)
   .select({
     Applications: "count"
   })
   .filter({
-    type: { neq: 'test' }
+    type: { neq: 'test' },
+    eventName: { eq: 'ApplicationSubmitAfter'}
   })
   .interval('daily')
-  .timeframe('this_week')
+  .timeframe(timeFrame)
   .groupBy('type')
-  .timezone('America/New_York');
+  .timezone(timeZone);
 
-var submittedByHourQuery = connect.query('ApplicationSubmitAfter')
+var submittedByHourQuery = connect.query(collection)
   .select({
     Applications: "count"
   })
   .filter({
-    type: { neq: 'test' }
+    type: { neq: 'test' },
+    eventName: { eq: 'ApplicationSubmitAfter'}
   })
   .interval('hourly')
   .timeframe('today')
   .groupBy('type')
-  .timezone('America/New_York');
+  .timezone(timeZone);
 
 var palette = {
     Commercial: '#1ABC9C',
@@ -208,18 +221,19 @@ connect.chart(submittedByHourQuery, '#appsByHour', {
 |  Queries for right column
 **************************************************************************/
 
-var tableQuery = connect.query('ApplicationSubmitAfter')
+var tableQuery = connect.query(collection)
   .select({
     Applications: "count",  
     feeTotal: { sum: 'feeTotal'}, 
     constrValue: { sum: 'constrValue'}
   })
   .filter({
-    type: { neq: 'test' }
+    type: { neq: 'test' },
+    eventName: { eq: 'ApplicationSubmitAfter'}
   })
   .groupBy(['type','subType'])
-  .timeframe('this_week')
-  .timezone('America/New_York');
+  .timeframe(timeFrame)
+  .timezone(timeZone);
 
 
 var fieldOptions = {
@@ -242,16 +256,16 @@ promise.then(function(results) {
                     Count: 'count',
                 })
                 .filter({type: 'Residential'})
-                .timeframe('this_week')
-                .timezone('America/New_York');
+                .timeframe(timeFrame)
+                .timezone(timeZone);
 
     var comQuery = connect.query('ApplicationSubmitAfter')
                 .select({
                     Count: 'count',
                 })
                 .filter({type: 'Commercial'})
-                .timeframe('this_week')
-                .timezone('America/New_York');
+                .timeframe(timeFrame)
+                .timezone(timeZone);
     
     //and build the graph    
     connect.gauge(comQuery, '#commercial', {
@@ -291,8 +305,8 @@ var tableQuery = connect.query('ApplicationSubmitAfter')
     type: { neq: 'test' }
   })
   .groupBy(['type','subType'])
-  .timeframe('this_week')
-  .timezone('America/New_York');
+  .timeframe(timeFrame)
+  .timezone(timeZone);
 
 connect.table(tableQuery, '#tableViz', {
     title: 'Summary Table',
